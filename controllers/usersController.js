@@ -21,6 +21,24 @@ module.exports = {
         }
     },
 
+    async findById(req, res, next){
+        try{
+
+            const id = req.params.id;
+
+            const data = await User.findByUserId(id);
+            console.log(`Usuario: ${data}`);
+            return res.status(201).json(data);
+        }
+        catch (error){
+            console.log(`Error: ${error}`);
+            return res.status(501).json({
+                success: false,
+                message: 'Error al obtener el usuario por ID'
+            });
+        }
+    },
+
     async register(req, res, next){
         try {
             const user = req.body;
@@ -52,8 +70,10 @@ module.exports = {
             const files = req.files;
 
             if(files.length > 0){
-                const pathImage = `image_${Date.now()}`; // NOMBRE DEL ARCHIVO QUE SE VA A ALMACENAR
+                const pathImage = `image_${Date.now()}`; // NOMBRE DEL ARCHIVO QUE SE VA A ALMACENAR               
                 const url = await storage(files[0], pathImage);
+
+                
 
                 if(url != undefined && url != null){
                     user.image = url;
@@ -79,6 +99,38 @@ module.exports = {
         }
     },
 
+    async update(req, res, next){
+        try {
+            const user = JSON.parse(req.body.user);
+            console.log(`Datos enviados del usuario: ${user}`);
+
+            const files = req.files;
+
+            if(files.length > 0){
+                const pathImage = `image_${Date.now()}`; // NOMBRE DEL ARCHIVO QUE SE VA A ALMACENAR               
+                const url = await storage(files[0], pathImage);
+
+                if(url != undefined && url != null){
+                    user.image = url;
+                }
+            }
+
+            await User.update(user);
+
+            return res.status(201).json({
+                success: true,
+                message: 'Los datos del usuario se actualizaron correctamente.'
+            });
+            
+        } catch (error) {
+            console.log(`Error: ${error}`);
+            return res.status(501).json({
+                success: false,
+                message: 'Hubo un error con la actualización el usuario',
+                error: error
+            })
+        }
+    },
     
 
     async login(req, res, next){
@@ -98,6 +150,7 @@ module.exports = {
             if(User.isPasswordMatched(password, myUser.password)){
                 const token = jwt.sign({id: myUser.id, email: myUser.email}, keys.secretOrKey, {
                     //    expiresIn: (60*60*24) // 1 HORA
+                        expiresIn: (60*2) // 2 MINUTOS
                 });
                 const data = {
                 id: myUser.id,
@@ -109,6 +162,8 @@ module.exports = {
                 session_token: `JWT ${token}`,
                 roles: myUser.roles
                 }
+
+                await User.updateToken(myUser.id, `JWT ${token}`);
 
                 console.log(`USUARIO ENVIADO ${data}`);
 
@@ -133,5 +188,26 @@ module.exports = {
                 error: error
             });
         }
+    },
+    async logout(req, res, next){
+        try{
+
+            const id = req.body.id;
+            await User.updateToken(id, null);
+
+            return res.status(201).json({
+                success: true,
+                message: 'La sesión del usuario se ha finalizado correctamente'
+            });
+            
+        }catch(error){
+            console.log(`Error: ${error}`);
+            return res.status(501).json({
+                success: false,
+                message: 'Error al momento de cerrar sesión',
+                error: error
+            });
+        }
     }
+
 };

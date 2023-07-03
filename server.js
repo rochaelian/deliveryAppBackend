@@ -1,4 +1,6 @@
 const express = require('express');
+const session = require('express-session');
+const passport = require('passport');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
@@ -20,6 +22,15 @@ const upload = multer({
     storage: multer.memoryStorage()
 })
 
+app.use(session({
+    secret: module.exports = {
+        app: app,
+        server: server
+    },
+    resave: false,
+    saveUninitialized: false
+  }));
+
 
 /*
  *   RUTAS
@@ -37,6 +48,9 @@ app.use(express.urlencoded({
     extended: true
 }));
 app.use(cors());
+app.use(passport.initialize());
+app.use(passport.session());
+require('./config/passport')(passport);
 
 app.disable('x-powered-by');
 
@@ -56,8 +70,3 @@ app.use((err, req, res, next) => {
     console.log(err);
     res.status(err.status || 500).send(err.stack);
 });
-
-module.exports = {
-    app: app,
-    server: server
-}
