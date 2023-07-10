@@ -12,11 +12,11 @@ types.setTypeParser(1114,  function(stringValue){
 });
 
 const databaseConfig = {
-    'host': '192.168.0.249',
+    'host': '192.168.0.100',
     'port': 5432,
     'database': 'delivery_app',
-    'user': 'postgres',
-    'password': 'ppanda'
+    'user': 'your user',
+    'password': 'your password'
 };
 
 const db = pgp(databaseConfig);

@@ -37,6 +37,8 @@ app.use(session({
  */
 
 const users = require('./routes/usersRoutes');
+const categories = require('./routes/categoriesRoutes');
+const products = require('./routes/productsRoutes');
 
 
 
@@ -60,8 +62,10 @@ app.set('port', port);
  *   LLAMANDO A LAS RUTAS
  */
 users(app, upload);
+categories(app);
+products(app, upload);
 
-server.listen(3000, '192.168.0.249' || 'localhost', function(){
+server.listen(3000, '192.168.0.100' || 'localhost', function(){
     console.log('Aplicacion de NodeJS ' + port + ' Iniciada...')
 });
 
