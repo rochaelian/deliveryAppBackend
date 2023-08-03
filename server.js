@@ -39,6 +39,7 @@ app.use(session({
 const users = require('./routes/usersRoutes');
 const categories = require('./routes/categoriesRoutes');
 const products = require('./routes/productsRoutes');
+const address = require('./routes/addressRoutes');
 
 
 
@@ -64,8 +65,9 @@ app.set('port', port);
 users(app, upload);
 categories(app);
 products(app, upload);
+address(app);
 
-server.listen(3000, '192.168.0.100' || 'localhost', function(){
+server.listen(3000, '192.168.0.103' || 'localhost', function(){
     console.log('Aplicacion de NodeJS ' + port + ' Iniciada...')
 });
 
